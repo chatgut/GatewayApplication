@@ -5,7 +5,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8081:8081"
+      - "8080:8080"
     environment:
       SPRING_PROFILES_ACTIVE: docker
     depends_on:
@@ -19,7 +19,7 @@ services:
   AuthService2:
     image: ghcr.io/chatgut/authservice2:latest
     ports:
-      - "8003:8080"
+      - "8003:8003"
 
   microPostServices:
     image: ghcr.io/chatgut/micropostservice:main
@@ -34,7 +34,7 @@ services:
   micro-url-shortener-service:
     image: ghcr.io/chatgut/micro-url-shortener-service:main
     ports:
-      - "8004:8080"
+      - "8004:8004"
 
   imageService:
     image: ghcr.io/chatgut/imageservice:main
