@@ -1,0 +1,47 @@
+services:
+  gateway:
+    image: gateway_application:latest
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8081:8081"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    depends_on:
+      - AuthService2
+      - microPostServices
+      - worthreadingservice
+      - micro-url-shortener-service
+      - imageService
+      - userService
+
+  AuthService2:
+    image: ghcr.io/chatgut/authservice2:latest
+    ports:
+      - "8003:8080"
+
+  microPostServices:
+    image: ghcr.io/chatgut/micropostservice:main
+    ports:
+      - "8000:8000"
+
+  worthreadingservice:
+    image: cchriss123/worthreadingservice:arm64
+    ports:
+      - "8005:8005"
+
+  micro-url-shortener-service:
+    image: ghcr.io/chatgut/micro-url-shortener-service:main
+    ports:
+      - "8004:8080"
+
+  imageService:
+    image: ghcr.io/chatgut/imageservice:main
+    ports:
+      - "8001:8001"
+
+  userService:
+    image: ghcr.io/chatgut/userservice:1.0
+    ports:
+      - "8002:8002"
