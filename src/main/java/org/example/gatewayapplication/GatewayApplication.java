@@ -23,7 +23,7 @@ public class GatewayApplication  {
                         .path("/auth/login/**")
                         .filters(f -> f.tokenRelay()
                                 .rewritePath("/auth/login/(?<segment>.*)", "/api/auth/login/${segment}"))
-                        .uri("http://authservice2:8080"))
+                        .uri("http://authservice2:8003"))
                 .route(p -> p
                         .path("/posts/**")
                         .filters(f -> f.filter(jwtAuthenticationFilter)
