@@ -1,6 +1,5 @@
 services:
   gateway:
-    image: gateway_application:latest
     build:
       context: .
       dockerfile: Dockerfile
