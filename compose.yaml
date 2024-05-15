@@ -1,6 +1,17 @@
+
 services:
+  mysql:
+    image: mysql:8.2.0
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: authservice-mysql
+      MYSQL_USER: developer
+      MYSQL_PASSWORD: password
+    networks:
+      - microservice-network
   gateway:
-    image: gateway_application:latest
+    image: gateway_application:0.2
     build:
       context: .
       dockerfile: Dockerfile
@@ -9,39 +20,63 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: docker
     depends_on:
-      - AuthService2
-      - microPostServices
+      - authservice2
+      - micropostservices
       - worthreadingservice
       - micro-url-shortener-service
-      - imageService
-      - userService
+      - imageservice
+      - userservice
+    networks:
+      - microservice-network
 
-  AuthService2:
+  authservice2:
     image: ghcr.io/chatgut/authservice2:latest
     ports:
       - "8003:8080"
+    networks:
+      - microservice-network
+    environment:
+      SPRING_DATASOURCE_URL: authservice-mysql:3306/authservice-mysql
+      SPRING_DATASOURCE_USERNAME: developer
+      SPRING_DATASOURCE_PASSWORD: password
 
-  microPostServices:
+
+  micropostservices:
     image: ghcr.io/chatgut/micropostservice:main
     ports:
       - "8000:8000"
+    networks:
+      - microservice-network
 
   worthreadingservice:
     image: cchriss123/worthreadingservice:arm64
     ports:
       - "8005:8005"
+    networks:
+      - microservice-network
 
   micro-url-shortener-service:
     image: ghcr.io/chatgut/micro-url-shortener-service:main
     ports:
       - "8004:8080"
+    networks:
+      - microservice-network
 
-  imageService:
+  imageservice:
     image: ghcr.io/chatgut/imageservice:main
     ports:
       - "8001:8001"
+    networks:
+      - microservice-network
 
-  userService:
+  userservice:
     image: ghcr.io/chatgut/userservice:1.0
     ports:
       - "8002:8002"
+    networks:
+      - microservice-network
+
+networks:
+  microservice-network:
+    driver: bridge
+

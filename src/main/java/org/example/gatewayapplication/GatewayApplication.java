@@ -15,37 +15,53 @@ public class GatewayApplication {
     }
 
     @Bean
-    RouteLocator gateway(RouteLocatorBuilder rlb) {
+    public RouteLocator gatewayRoutes(RouteLocatorBuilder rlb, JwtAuthenticationFilter jwtAuthenticationFilter) {
         return rlb
                 .routes()
                 .route(p -> p
                         .path("/auth/login/**")
-                        .filters(f -> f
-                                .tokenRelay()
-                                .rewritePath("/auth/login/(?<segment>.*)", "/api/auth/login/$\\{segment}"))
-                        .uri("http://localhost:8003"))
+                        .filters(f -> f.tokenRelay()
+                                .rewritePath("/auth/login/(?<segment>.*)", "/api/auth/login/${segment}"))
+                        .uri("http://authservice2:8080"))
                 .route(p -> p
                         .path("/posts/**")
-                        .filters(f -> f.rewritePath("/posts/(?<segment>.*)", "/posts/$\\{segment}"))
-                        .uri("http://localhost:8000"))
+                        .filters(f -> f.filter(jwtAuthenticationFilter)
+                                .rewritePath("/posts/(?<segment>.*)", "/posts/${segment}"))
+                        .uri("http://micropostservices:8000"))
                 .route(p -> p
                         .path("/images/**")
-                        .filters(f -> f.rewritePath("/images/(?<segment>.*)", "/images/$\\{segment}"))
-                        .uri("http://localhost:8001"))
+                        .filters(f -> f.filter(jwtAuthenticationFilter)
+                                .rewritePath("/images/(?<segment>.*)", "/images/${segment}"))
+                        .uri("http://imageservice:8001"))
                 .route(p -> p
                         .path("/users/**")
-                        .filters(f -> f.rewritePath("/users/(?<segment>.*)", "/users/$\\{segment}"))
-                        .uri("http://localhost:8002"))
-
+                        .filters(f -> f.filter(jwtAuthenticationFilter)
+                                .rewritePath("/users/(?<segment>.*)", "/users/${segment}"))
+                        .uri("http://userservice:8002"))
                 .route(p -> p
                         .path("/like/**")
-                        .filters(f -> f.rewritePath("/like/(?<segment>.*)", "/like/$\\{segment}"))
-                        .uri("http://localhost:8005"))
+                        .filters(f -> f.filter(jwtAuthenticationFilter)
+                                .rewritePath("/like/(?<segment>.*)", "/like/${segment}"))
+                        .uri("http://worthreadingservice:8005"))
+                .route(p -> p
+                        .path("/shorten/**")
+                        .filters(f -> f.filter(jwtAuthenticationFilter)
+                                .rewritePath("/shorten/(?<segment>.*)", "/shorten/${segment}"))
+                        .uri("http://micro-url-shortener-service:8080"))
                 .build();
     }
 
 
+
 }
+
+
+
+
+
+
+
+
 
 
 
