@@ -18,13 +18,62 @@ services:
 
   AuthService2:
     image: ghcr.io/chatgut/authservice2:latest
+    depends_on:
+      - authservice-mysql
+    container_name: authservice2
     ports:
-      - "8003:8003"
+      - "8003:8080"
+    environment:
+      DB_URL: authservice-mysql:3306/authservice-mysql
+      DB_USER: developer
+      DB_PASS: password
+  authservice-mysql:
+    image: 'mysql:latest'
+    container_name: authservice2-mysql
+    volumes:
+      - db_auth:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: authservice-mysql
+      MYSQL_USER: developer
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_HOST: '%'
+    ports:
+      - "3307:3307"
 
+#  microPostServices:
+#    image: ghcr.io/chatgut/micropostservice:main
+#    ports:
+#      - "8000:8000"
   microPostServices:
     image: ghcr.io/chatgut/micropostservice:main
+    container_name: microPostServices
+    restart: on-failure
+    depends_on:
+      - mongodb
+      - rabbitMQ
+    environment:
+      ROCKET_DATABASES: '{postservice={url="mongodb://dbMongoDB:27017"}}'
+      ROCKET_RABBIT_HOST: "amqp://QueueRabbitMQ:5672"
     ports:
       - "8000:8000"
+  mongodb:
+    image: 'mongo:latest'
+    container_name: dbMongoDb
+    volumes:
+      - dbData:/var/lib/mongodb
+    ports:
+      - "27017:27017"
+
+  rabbitMQ:
+    image: 'rabbitmq:3-management'
+    container_name: QueueRabbitMq
+    volumes:
+      - dbData:/var/lib/rabbitmq
+    ports:
+      - "15672:15672"
+      - "5672:5672"
 
   worthreadingservice:
     image: cchriss123/worthreadingservice:arm64
@@ -36,12 +85,66 @@ services:
     ports:
       - "8004:8004"
 
+#  imageService:
+#    image: ghcr.io/chatgut/imageservice:main
+#    ports:
+#      - "8001:8001"
+
   imageService:
-    image: ghcr.io/chatgut/imageservice:main
+    image: ghcr.io/chatgut/imageservicebov:sha-925024f
+    depends_on:
+      - imageService-mysql
     ports:
       - "8001:8001"
+    environment:
+      DB_URL: imageservice-mysql:3306/imageservice-mysql
+      DB_USER: developer
+      DB_PASS: password
+  imageService-mysql:
+    image: "mysql:latest"
+    container_name: imageService-mysql
+    volumes:
+      - db_mysql:/var/lib/mysql
+    environment:
+      MYSQL_ROOT_HOST: "%"
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: imageservice-mysql
+      MYSQL_USER: developer
+      MYSQL_PASSWORD: password
+      MYSQL_HOST: '%'
+    ports:
+      - "3309:3306"
 
+#  userService:
+#    image: ghcr.io/chatgut/userservice:1.0
+#    ports:
+#      - "8002:8002"
   userService:
     image: ghcr.io/chatgut/userservice:1.0
+    container_name: userService
     ports:
       - "8002:8002"
+    depends_on:
+      - dbUsers
+    environment:
+      DB_URL: jdbc:mysql://dbUsers:3306/userService
+      DB_USER: developer
+      DB_PASSWORD: password
+
+  dbUsers:
+    image: mysql:latest
+    environment:
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_ROOT_USER: root
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: userService
+      MYSQL_PASSWORD: password
+      MYSQL_USER: developer
+    volumes:
+      - dbUsers:/var/lib/mysql
+volumes:
+  db_auth:
+  dbUsers:
+  dbData:
+  dbWR:
+  db_mysql:
