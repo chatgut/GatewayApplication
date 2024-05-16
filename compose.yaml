@@ -41,10 +41,10 @@ services:
     ports:
       - "3307:3307"
 
-#  microPostServices:
-#    image: ghcr.io/chatgut/micropostservice:main
-#    ports:
-#      - "8000:8000"
+  #  microPostServices:
+  #    image: ghcr.io/chatgut/micropostservice:main
+  #    ports:
+  #      - "8000:8000"
   microPostServices:
     image: ghcr.io/chatgut/micropostservice:main
     container_name: microPostServices
@@ -74,20 +74,51 @@ services:
       - "15672:15672"
       - "5672:5672"
 
+  #  worthreadingservice:
+  #    image: cchriss123/worthreadingservice:arm64
+  #    ports:
+  #      - "8005:8005"
   worthreadingservice:
-    image: cchriss123/worthreadingservice:arm64
+    image: ghcr.io/chatgut/worthreadingservice:master
+    container_name: worthreadingService
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:mysql://mysql:3306/demo
+      DB_USER: developer
+      DB_PASS: password
     ports:
       - "8005:8005"
+
+  mysql:
+    image: 'mysql:latest'
+    container_name: mysqlDB
+    volumes:
+      - dbWR:/var/lib/mysql
+    environment:
+      MYSQL_DATABASE: demo
+      MYSQL_USER: developer
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_HOST: '%'
+      MYSQL_ROOT_PASSWORD: password
+    ports:
+      - '3306:3306'
+    healthcheck:
+      test: [ "CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u $$MYSQL_USER -p$$MYSQL_PASSWORD" ]
+      interval: 30s
+      timeout: 10s
+      retries: 5
 
   micro-url-shortener-service:
     image: ghcr.io/chatgut/micro-url-shortener-service:main
     ports:
       - "8004:8004"
 
-#  imageService:
-#    image: ghcr.io/chatgut/imageservice:main
-#    ports:
-#      - "8001:8001"
+  #  imageService:
+  #    image: ghcr.io/chatgut/imageservice:main
+  #    ports:
+  #      - "8001:8001"
 
   imageService:
     image: ghcr.io/chatgut/imageservicebov:sha-925024f
@@ -114,10 +145,10 @@ services:
     ports:
       - "3309:3306"
 
-#  userService:
-#    image: ghcr.io/chatgut/userservice:1.0
-#    ports:
-#      - "8002:8002"
+  #  userService:
+  #    image: ghcr.io/chatgut/userservice:1.0
+  #    ports:
+  #      - "8002:8002"
   userService:
     image: ghcr.io/chatgut/userservice:1.0
     container_name: userService
