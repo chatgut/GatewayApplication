@@ -36,7 +36,7 @@ public class JwtAuthenticationFilter implements GatewayFilter {
 
        String token = authHeader.substring(7);
 
-       // Validate the token with authservice
+       // Validate  token with authservice
        return webClientBuilder.build()
                .post()
                .uri("http://authservice2:8080/api/auth/validate")

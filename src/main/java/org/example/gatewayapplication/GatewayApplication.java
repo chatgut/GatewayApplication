@@ -48,7 +48,7 @@ public class GatewayApplication  {
                         .path("/shorten/**")
                         .filters(f -> f.filter(jwtAuthenticationFilter)
                                 .rewritePath("/shorten/(?<segment>.*)", "/shorten/${segment}"))
-                        .uri("http://micro-url-shortener-service:8080"))
+                        .uri("http://micro-url-shortener-service:8004"))
                 .build();
     }
 }
