@@ -52,8 +52,6 @@ public class GatewayApplication  {
                         .uri("http://micro-url-shortener-service:8080"))
                 .build();
     }
-
-
 }
 
 
