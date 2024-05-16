@@ -41,10 +41,6 @@ services:
     ports:
       - "3307:3307"
 
-  #  microPostServices:
-  #    image: ghcr.io/chatgut/micropostservice:main
-  #    ports:
-  #      - "8000:8000"
   microPostServices:
     image: ghcr.io/chatgut/micropostservice:main
     container_name: microPostServices
@@ -74,10 +70,6 @@ services:
       - "15672:15672"
       - "5672:5672"
 
-  #  worthreadingservice:
-  #    image: cchriss123/worthreadingservice:arm64
-  #    ports:
-  #      - "8005:8005"
   worthreadingservice:
     image: ghcr.io/chatgut/worthreadingservice:master
     container_name: worthreadingService
@@ -112,13 +104,23 @@ services:
 
   micro-url-shortener-service:
     image: ghcr.io/chatgut/micro-url-shortener-service:main
+    container_name: micro-url-shortener
+    restart: on-failure
+    volumes:
+      - dbMicroUrl:/var/lib/mongodbMicroUrl
     ports:
       - "8004:8004"
+    depends_on:
+      - mongodbMicroUrl
+    environment:
+      APP_DOMAIN_NAME: http://localhost:8080/
+      MONGO_DB_URI: mongodb://mongodbMicroUrl:27017
 
-  #  imageService:
-  #    image: ghcr.io/chatgut/imageservice:main
-  #    ports:
-  #      - "8001:8001"
+  mongodbMicroUrl:
+    image: mongo:6.0.5
+    container_name: microUrlMongoDB
+    ports:
+      - "27018:27017"
 
   imageService:
     image: ghcr.io/chatgut/imageservicebov:sha-925024f
@@ -178,3 +180,4 @@ volumes:
   dbData:
   dbWR:
   db_mysql:
+  dbMicroUrl:
