@@ -26,6 +26,7 @@ services:
       DB_URL: authservice-mysql:3306/authservice-mysql
       DB_USER: developer
       DB_PASS: password
+
   authservice-mysql:
     image: 'mysql:latest'
     container_name: authservice2-mysql
@@ -53,11 +54,12 @@ services:
       ROCKET_RABBIT_HOST: "amqp://QueueRabbitMQ:5672"
     ports:
       - "8000:8000"
+
   mongodb:
     image: 'mongo:latest'
     container_name: dbMongoDb
     volumes:
-      - dbData:/var/lib/mongodb
+      - db_mongoPost:/data/db
     ports:
       - "27017:27017"
 
@@ -65,7 +67,7 @@ services:
     image: 'rabbitmq:3-management'
     container_name: QueueRabbitMq
     volumes:
-      - dbData:/var/lib/rabbitmq
+      - db_rabbitPost:/var/lib/rabbitmq
     ports:
       - "15672:15672"
       - "5672:5672"
@@ -106,8 +108,6 @@ services:
     image: ghcr.io/chatgut/micro-url-shortener-service:main
     container_name: micro-url-shortener
     restart: on-failure
-    volumes:
-      - dbMicroUrl:/var/lib/mongodbMicroUrl
     ports:
       - "8004:8004"
     depends_on:
@@ -118,7 +118,9 @@ services:
 
   mongodbMicroUrl:
     image: mongo:6.0.5
-    container_name: microUrlMongoDB
+    container_name: mongodbMicroUrl
+    volumes:
+      - db_MicroUrl:/data/db
     ports:
       - "27018:27017"
 
@@ -147,10 +149,6 @@ services:
     ports:
       - "3309:3306"
 
-  #  userService:
-  #    image: ghcr.io/chatgut/userservice:1.0
-  #    ports:
-  #      - "8002:8002"
   userService:
     image: ghcr.io/chatgut/userservice:1.0
     container_name: userService
@@ -177,7 +175,8 @@ services:
 volumes:
   db_auth:
   dbUsers:
-  dbData:
+  db_mongoPost:
+  db_rabbitPost:
+  db_MicroUrl:
   dbWR:
   db_mysql:
-  dbMicroUrl:
