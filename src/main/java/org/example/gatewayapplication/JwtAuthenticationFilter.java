@@ -3,6 +3,7 @@ package org.example.gatewayapplication;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
 import org.springframework.http.server.reactive.ServerHttpRequest;
@@ -18,7 +19,7 @@ public class JwtAuthenticationFilter implements GatewayFilter {
     @Autowired
     private WebClient.Builder webClientBuilder;
 
-   @Override
+  /* @Override
    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
        String path = exchange.getRequest().getURI().getPath();
 
@@ -49,7 +50,44 @@ public class JwtAuthenticationFilter implements GatewayFilter {
                    exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
                    return exchange.getResponse().setComplete();
                });
-   }
+   }*/
+
+    @Override
+    public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
+        String path = exchange.getRequest().getURI().getPath();
+
+        // Skip authentication for the login endpoint
+        if (path.contains("/auth/login")) {
+            return chain.filter(exchange);
+        }
+
+        // Get the Authorization header
+        String authHeader = exchange.getRequest().getHeaders().getFirst(HttpHeaders.AUTHORIZATION);
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+            return exchange.getResponse().setComplete();
+        }
+
+        String token = authHeader.substring(7);
+
+        // Get the CSRF token from the request headers
+        String csrfToken = exchange.getRequest().getHeaders().getFirst("X-CSRF-TOKEN");
+
+        // Validate token with authservice
+        return webClientBuilder.build()
+                .post()
+                .uri("http://authservice2:8080/api/auth/validate")
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + token)
+                .header("X-CSRF-TOKEN", csrfToken)  // Forward the CSRF token
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, response -> Mono.error(new RuntimeException("Invalid Token")))
+                .bodyToMono(Void.class)
+                .then(chain.filter(exchange))
+                .onErrorResume(e -> {
+                    exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                    return exchange.getResponse().setComplete();
+                });
+    }
 
 
 }

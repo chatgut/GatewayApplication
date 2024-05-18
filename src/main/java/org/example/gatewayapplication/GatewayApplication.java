@@ -20,7 +20,7 @@ public class GatewayApplication  {
         return rlb
                 .routes()
                 .route(p -> p
-                        .path("/auth/login/**")
+                        .path("auth/login/**")
                         .filters(f -> f.tokenRelay()
                                 .rewritePath("/auth/login/(?<segment>.*)", "/api/auth/login/${segment}"))
                         .uri("http://authservice2:8003"))
