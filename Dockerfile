@@ -1,9 +1,3 @@
-#FROM eclipse-temurin:22-jre-alpine
-#WORKDIR /app
-#COPY target/GatewayApplication-0.0.1-SNAPSHOT.jar app.jar
-#
-#ENTRYPOINT ["java", "-jar","app.jar"]
-
 FROM maven:3.9.6-eclipse-temurin-22-alpine AS build
 WORKDIR /app
 COPY src /app/src
