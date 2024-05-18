@@ -8,14 +8,14 @@ services:
     environment:
       SPRING_PROFILES_ACTIVE: docker
     depends_on:
-      - AuthService2
-      - microPostServices
+      - authservice
+      - micropostservices
       - worthreadingservice
       - micro-url-shortener-service
       - imageService
       - userService
 
-  AuthService2:
+  authservice:
     image: ghcr.io/chatgut/authservice2:latest
     depends_on:
       - authservice-mysql
@@ -38,11 +38,10 @@ services:
       MYSQL_PASSWORD: password
       MYSQL_ROOT_HOST: '%'
       MYSQL_ROOT_PASSWORD: password
-      MYSQL_HOST: '%'
     ports:
-      - "3307:3307"
+      - "3307:3306"
 
-  microPostServices:
+  micropostservices:
     image: ghcr.io/chatgut/micropostservice:main
     container_name: microPostServices
     restart: on-failure
@@ -92,12 +91,12 @@ services:
       - dbWR:/var/lib/mysql
     environment:
       MYSQL_DATABASE: demo
-      MYSQL_USER: developer
-      MYSQL_PASSWORD: password
       MYSQL_ROOT_HOST: '%'
       MYSQL_ROOT_PASSWORD: password
+      MYSQL_USER: developer
+      MYSQL_PASSWORD: password
     ports:
-      - '3306:3306'
+      - '3305:3306'
     healthcheck:
       test: [ "CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u $$MYSQL_USER -p$$MYSQL_PASSWORD" ]
       interval: 30s
@@ -113,7 +112,7 @@ services:
     depends_on:
       - mongodbMicroUrl
     environment:
-      APP_DOMAIN_NAME: http://localhost:8080/
+      APP_DOMAIN_NAME: http://localhost:8004/
       MONGO_DB_URI: mongodb://mongodbMicroUrl:27017
 
   mongodbMicroUrl:
@@ -140,12 +139,11 @@ services:
     volumes:
       - db_mysql:/var/lib/mysql
     environment:
+      MYSQL_DATABASE: imageservice-mysql
       MYSQL_ROOT_HOST: "%"
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: imageservice-mysql
       MYSQL_USER: developer
       MYSQL_PASSWORD: password
-      MYSQL_HOST: '%'
     ports:
       - "3309:3306"
 
@@ -165,13 +163,14 @@ services:
     image: mysql:latest
     environment:
       MYSQL_ROOT_HOST: '%'
-      MYSQL_ROOT_USER: root
       MYSQL_ROOT_PASSWORD: password
       MYSQL_DATABASE: userService
       MYSQL_PASSWORD: password
       MYSQL_USER: developer
     volumes:
       - dbUsers:/var/lib/mysql
+    ports:
+      - "3308:3306"
 volumes:
   db_auth:
   dbUsers:
