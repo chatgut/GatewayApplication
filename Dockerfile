@@ -13,8 +13,8 @@ RUN mkdir -p /app/target/dependency && (cd /app/target/dependency; jar -xf ../*.
 
 FROM eclipse-temurin:22-jre-alpine
 ARG DEPENDENCY=/app/target/dependency
+EXPOSE 8080
 COPY --from=build ${DEPENDENCY}/BOOT-INF/lib /app/lib
 COPY --from=build ${DEPENDENCY}/META-INF /app/META-INF
 COPY --from=build ${DEPENDENCY}/BOOT-INF/classes /app
 ENTRYPOINT ["java","-cp","/app:/app/lib/*","org.example.gatewayapplication.GatewayApplication"]
-
