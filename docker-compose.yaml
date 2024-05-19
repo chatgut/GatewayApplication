@@ -21,7 +21,7 @@ services:
       - authservice-mysql
     container_name: authservice2
     ports:
-      - "8003:8003"
+      - "8003:8080"
     environment:
       DB_URL: authservice-mysql:3306/authservice-mysql
       DB_USER: developer
