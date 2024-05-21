@@ -4,7 +4,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8081:8080"
+      - "8081:8081"
     environment:
       SPRING_PROFILES_ACTIVE: docker
     depends_on:
@@ -14,7 +14,12 @@ services:
       - micro-url-shortener-service
       - imageService
       - userService
+      - frontend
 
+  frontend:
+    image: frontend123:latest
+    ports:
+      - "8080:8080"
   authservice:
     image: ghcr.io/chatgut/authservice2:latest
     depends_on:
