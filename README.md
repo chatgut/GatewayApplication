@@ -3,7 +3,6 @@ Gateway service that act as a single entry point for all client requests to the 
 
 ## Architecture
 ### The Gateway Application routes client requests to various microservices, such as:
-* Auth Service: Handles authentication
 * Micro Post Service: Manages posts
 * Worth Reading Service: Manages reading recommendations
 * Micro URL Shortener Service: Shortens URLs
@@ -24,9 +23,6 @@ Gateway run on port:8081
   - RabbitMQ on ports: 15672, 5672
 ---
 ## Services used in application
-**AuthService**
-<https://github.com/chatgut/AuthService2>
-
 **Chat messages**
 <https://github.com/chatgut/microPostService>
 
