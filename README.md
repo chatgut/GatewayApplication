@@ -10,8 +10,12 @@ Gateway service that act as a single entry point for all client requests to the 
 * User Service: Manages user information
 ---
 ## How to run
-* mvn clean package
-* docker compose up --build gateway -d
+* Upload frontend (branch gateway-only) from https://github.com/chatgut/frontend
+  - Create image for frontend:
+  - run mvn clean package
+  - docker build -t frontend123:latest .
+### In the GatewayApplication
+ * run docker compose up --build gateway -d
 ---
 ### Ports:
 Gateway run on port:8081
